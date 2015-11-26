@@ -5,7 +5,6 @@ RUN useradd --comment Sonarr --create-home --gid users --no-user-group --shell /
 
   && REQUIRED_PACKAGES="gpac nzbdrone python" \
   && BUILD_PACKAGES="build-essential libffi-dev libssl-dev python-dev wget xz-utils" \
-  && FFMPEG_PACKAGES="autoconf automake build-essential ccache debhelper frei0r-plugins-dev libasound2-dev libass-dev libavc1394-dev libbluray-dev libbs2b-dev libbz2-dev libcdio-paranoia-dev libcrystalhd-dev libdc1394-22-dev libfaac-dev libfaac0 libfaad-dev libfdk-aac-dev libfontconfig1-dev libfreetype6-dev libgnutls-openssl-dev libgsm1-dev libiec61883-dev libjack-jackd2-dev liblzo2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev libopenjpeg-dev libopus-dev libpulse-dev libquvi-dev librtmp-dev libschroedinger-dev libsctp-dev libsdl-dev libsoxr-dev libspeex-dev libssl-dev libtheora-dev libtool libva-dev libvdpau-dev libvo-aacenc-dev libvo-amrwbenc-dev libvorbis-dev libvpx-dev libwebp-dev libx264-dev libxfixes-dev libxvidcore-dev libxvmc-dev libzvbi-dev nvidia-opencl-dev pkg-config quilt texinfo wget yasm zlib1g-dev" \
 
   && echo "debconf debconf/frontend select noninteractive" | debconf-set-selections \
 
@@ -18,11 +17,7 @@ RUN useradd --comment Sonarr --create-home --gid users --no-user-group --shell /
   && printf "%s\n" \
     "deb http://apt.sonarr.tv/ master main" \
     >> /etc/apt/sources.list.d/sonarr.list \
-  && printf "%s\n" \
-    "deb http://httpredir.debian.org/debian jessie-backports main" \
-    >> /etc/apt/sources.list \
   && sed \
-    -e "s/jessie main/jessie main contrib non-free/" \
     -e "s/httpredir.debian.org/debian.mirror.constant.com/" \
     -i /etc/apt/sources.list \
 
@@ -30,8 +25,6 @@ RUN useradd --comment Sonarr --create-home --gid users --no-user-group --shell /
   && apt-get install -qqy \
     $REQUIRED_PACKAGES \
     $BUILD_PACKAGES \
-    $FFMPEG_PACKAGES \
-  && apt-get -t jessie-backports install -qqy libx265-dev \
 
   && wget \
     --no-check-certificate \
@@ -54,73 +47,12 @@ RUN useradd --comment Sonarr --create-home --gid users --no-user-group --shell /
     > /etc/services.d/sonarr/run \
   && chmod +x /etc/services.d/sonarr/run \
 
-  && mkdir -p /tmp/ffmpeg/ \
+  && mkdir -p /home/ffmpeg/ \
   && wget \
-    --no-check-certificate \
     --output-document - \
     --quiet \
-    https://api.github.com/repos/FFmpeg/FFmpeg/tarball/n2.8.2 \
-    | tar -xz -C /tmp/ffmpeg/ \
-  && mv /tmp/ffmpeg/*/* /tmp/ffmpeg/ \
-  && cd /tmp/ffmpeg/ \
-  && wget \
-    --no-check-certificate \
-    --output-document - \
-    --quiet \
-    https://gist.github.com/outlyer/4a88f1adb7f895b93fd9/raw/ffmpeg-2.8-defaultstreams.patch \
-    | patch -p1 \
-  && ./configure \
-    --bindir="/home/ffmpeg" \
-    --disable-debug \
-    --disable-indev=sndio \
-    --disable-outdev=sndio \
-    --disable-shared \
-    --enable-avresample \
-    --enable-fontconfig \
-    --enable-frei0r \
-    --enable-gnutls \
-    --enable-gpl \
-    --enable-gray \
-    --enable-hardcoded-tables \
-    --enable-libass \
-    --enable-libcaca \
-    --enable-libdc1394 \
-    --enable-libfaac \
-    --enable-libfdk-aac \
-    --enable-libfontconfig \
-    --enable-libfreetype \
-    --enable-libfribidi \
-    --enable-libgsm \
-    --enable-libmp3lame \
-    --enable-libopencore-amrnb \
-    --enable-libopencore-amrwb \
-    --enable-libopenjpeg \
-    --enable-libopus \
-    --enable-libquvi \
-    --enable-librtmp \
-    --enable-libschroedinger \
-    --enable-libsoxr \
-    --enable-libspeex \
-    --enable-libtheora \
-    --enable-libvo-aacenc \
-    --enable-libvo-amrwbenc \
-    --enable-libvorbis \
-    --enable-libvpx \
-    --enable-libwebp \
-    --enable-libx264 \
-    --enable-libx265 \
-    --enable-libxvid \
-    --enable-nonfree \
-    --enable-opencl \
-    --enable-openssl \
-    --enable-postproc \
-    --enable-pthreads \
-    --enable-runtime-cpudetect \
-    --enable-swscale \
-    --enable-version3 \
-    --enable-zlib \
-  && make \
-  && make install \
+    http://cdn.ptb2.me/ffmpeg-2.8.2.tar.gz \
+    | tar -xz -C /home/ffmpeg/ \
 
   && wget \
     --no-check-certificate \
@@ -158,7 +90,6 @@ RUN useradd --comment Sonarr --create-home --gid users --no-user-group --shell /
 
   && apt-get purge -qqy --auto-remove \
     $BUILD_PACKAGES \
-    $FFMPEG_PACKAGES \
   && apt-get clean -qqy \
   && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
