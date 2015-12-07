@@ -103,11 +103,12 @@ RUN \
   && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
 ENTRYPOINT ["/init"]
-EXPOSE 8989
+EXPOSE 8989 9898
 
 # docker build --rm --tag ptb2/sonarr .
 # docker run --detach --name sonarr --net host \
 #   --publish 8989:8989/tcp \
+#   --publish 9898:9898/tcp \
 #   --volume /volume1/Config/mkv-to-m4v/autoProcess.ini:/app/mkv-to-m4v/autoProcess.ini \
 #   --volume /volume1/Config/Sonarr:/home/sonarr \
 #   --volume /volume1/Media:/home/media \
