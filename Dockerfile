@@ -2,7 +2,7 @@ FROM debian:jessie
 # MAINTAINER Peter T Bosse II <ptb@ioutime.com>
 
 RUN \
-  REQUIRED_PACKAGES="nzbdrone python" \
+  REQUIRED_PACKAGES="gpac mp4v2-utils nzbdrone python" \
   && BUILD_PACKAGES="build-essential libffi-dev libssl-dev python-dev wget" \
 
   && USERID_ON_HOST=1026 \
